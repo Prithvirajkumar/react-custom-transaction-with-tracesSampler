@@ -11,13 +11,39 @@ const theme = createTheme();
 
 export default function SignIn() {
   const [userName, setUserName] = React.useState("");
+
+  const userIdCalc = () => {
+    return "12312012";
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(userName);
+    const transaction = Sentry.startTransaction(
+      {
+        name: "Search from navbar",
+        op: "search",
+        tags: {
+          testGroup: "A3",
+          treatmentName: "eager load",
+        },
+      },
+      {
+        userId: userIdCalc(),
+      }
+    );
+    Sentry.getCurrentHub().configureScope((scope) =>
+      scope.setSpan(transaction)
+    );
+    Sentry.setTag("userName", userName);
+    Sentry.setTag("urlTest", "https://www.google.com/");
+    // throw new Error("Prithvi breaks the code");
+    // console.error("Simon breaks the code");
     if (userName === "Prithvi") {
-      Sentry.setTag("userName", userName);
+      // Sentry.captureException("Prithvi breaks the code");
       throw new Error("Prithvi breaks the code");
     }
+    transaction.finish();
   };
 
   return (
